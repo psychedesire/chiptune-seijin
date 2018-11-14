@@ -1,0 +1,22 @@
+{
+  "name": "chiptune-seijin",
+  "version": "1.0.0",
+  "description": "chiptune-seijin",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.heroku.com/chiptune-seijin"
+  },
+  "keywords": [
+    "chiptune",
+    "three.js"
+  ],
+  "author": "psychedesire",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}

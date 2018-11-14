@@ -1,0 +1,104 @@
+@charset "UTF-8";
+
+html, a, address, article, aside, audio,
+b, blockquote, body, br, canvas, caption, cite, code,
+dd, del, div, dl, dt, em,
+fieldset, figcaption, figure, footer, form,
+h1, h2, h3, h4, h5, h6, header, hr,
+i, iframe, img, input, ins, label, li,
+main, mark, nav, ol, p, pre,
+section, sidebar, small, span, strong,
+table, tbody, td, textarea, tfoot, th, thead, tr,
+ul, video, wbr {
+	box-sizing    : border-box;
+	font-family   : "Ubuntu Condensed", "Droid Sans Mono","游ゴシック","Yu Gothic",YuGothic,"ヒラギノゴシック Pro","Hiragino Gothic Pro","ヒラギノゴシック ProN","Hiragino Gothic ProN","メイリオ","ＭＳ Ｐゴシック",sans-serif;
+	font-weight   : normal;
+	line-height   : 100%;
+	margin        : 0;
+	overflow-wrap : break-word;
+	padding       : 0;
+	vertical-align: middle;
+	word-wrap     : break-word;
+}
+
+
+/*
+ *
+ * ***************************** color *** */
+.sf1 { color: #424b54; }
+.sf2 { color: #406e8e; }
+.sf3 { color: #8ea8c3; }
+.sf4 { color: #cfe8ef; }
+.sf5 { color: #fefeff; }
+.bg1  { background-color:#424b54; color: #fefeff; }
+.bg2  { background-color:#406e8e; color: #fefeff; }
+.bg3  { background-color:#8ea8c3; color: #fefeff; }
+.bg4  { background-color:#cfe8ef; color: #424b54; }
+.bg5  { background-color:#fefeff; color: #424b54; }
+
+
+/*
+ *
+ * ***************************** reset *** */
+html {
+	height: 100%;
+	width : 100%;
+}
+body {
+	-webkit-text-size-adjust: none;
+	background-color        : #fefefe;
+	color                   : #231815;
+	position                : relative;
+	text-align              : left;
+	width                   : 100%;
+}
+a {
+	border         : 0px solid #406e8e;
+	color          : #406e8e;
+	display        : inline-block;
+	text-decoration: none;
+	vertical-align : baseline;
+}
+figure { display        : inline-block; }
+img    { border-style   : none; }
+ul, dl { list-style-type: none; }
+table  { border-collapse: collapse; }
+
+
+/*
+ *
+ * ***************************** form element *** */
+input[type=text],
+input[type=password],
+input[type=number],
+input[type=date],
+select, textarea {
+	-webkit-appearance: none;
+	border            : 0px solid #000;
+	border-radius     : 1px;
+}
+input[type=button],
+input[type=submit],
+.btn {
+	-webkit-appearance: none;
+	background        : #406e8e;
+	border            : 0px solid #406e8e;
+	border-radius     : 2px;
+	color             : #fefefe;
+	cursor            : pointer;
+	font-size         : 16px;
+	padding           : 8px 18px;
+}
+.btn {}
+
+
+/*
+ *
+ * ***************************** font *** */
+.serif {
+	font-family   : "Ubuntu Condensed","Montserrat","游明朝","Yu Mincho",YuMincho,"ヒラギノ明朝 Pro","Hiragino Mincho Pro","ヒラギノ明朝 ProN","Hiragino Mincho ProN","メイリオ","ＭＳ Ｐ明朝",serif;
+}
+.sans {
+	font-family   : "Ubuntu Condensed","Montserrat","游ゴシック","Yu Gothic",YuGothic,"ヒラギノゴシック Pro","Hiragino Gothic Pro","ヒラギノゴシック ProN","Hiragino Gothic ProN","メイリオ","ＭＳ Ｐゴシック",sans-serif;
+}
+

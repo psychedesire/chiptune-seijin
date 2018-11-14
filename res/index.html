@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="ja">
+	<head>
+		<meta charset="utf-8">
+		<title>チプチュー星人</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="keywords" content="psychedesire,LiveStream">
+		<meta name="description" content="LiveStreamSystem">
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<meta property="og:site_name" content="www.psychedesire.org">
+		<meta property="og:type" content="article">
+		<meta property="og:url" content="http://localhost:8080/livestream/">
+		<meta property="og:title" content="www.psychedesire.org > LiveStream">
+		<meta property="og:description" content="psychedesire LiveStreamSystem">
+		<meta property="og:image" content="http://www.psychedesire.org/images/icon.png">
+		<meta property="og:locale" content="ja_JP">
+		<link rel="icon" type="image/png" href="./images/icon.png">
+		<link href="./css/fontawesome_all.css" media="all" rel="stylesheet">
+		<link href="./css/reset.css" media="all" rel="stylesheet">
+		<style>
+body {
+	background: #000;
+}
+
+
+/*
+ *
+ * avatar
+ *
+ * *************************** */
+.avatar {
+	text-align:center;
+}
+.avatar__image {
+	height: auto;
+	margin: 0 auto;
+	width : 48px;
+}
+.avatar__image_src {
+	height: auto;
+	width: 100%;
+}
+.avatar__title {
+	height: 16px;
+	margin: 10px auto 0 auto;
+}
+.avatar__icon {
+	display       : inline-block;
+	height        : 16px;
+	margin-right  : 3px;
+	width         : 16px;
+}
+.avatar__icon_src {
+	height: auto;
+	width : 100%;
+}
+.avatar__name {
+	display       : inline-block;
+	font-size     : 12px;
+	height        : 16px;
+	padding-top   : 2px;
+}
+		</style>
+		<script src="./js/three.min.js"></script>
+		<script src="./js/CSS3DRenderer.js"></script>
+		<script src="./js/pico_user.js"></script>
+		<script src="./js/pico_stage.js"></script>
+		<script src="./js/pico_midi_ctrl.js"></script>
+		<script src="./js/pico_midi_kbd.js"></script>
+		<script src="./js/pico_osc.js"></script>
+		<script src="./js/pico_kbd.js"></script>
+		<script>
+window.onload = function(){
+	  let midi_ch   = 0;
+	const audio_ctx = new (window.AudioContext || window.webkitAudioContext)();
+	const bpm       = 120;
+	const users     = {};
+
+	//
+	// Current User
+	const user = new PicoUser();
+
+	//
+	// WebAudio OSC
+	const osc = new PicoOSC({
+		ch : midi_ch,
+		ctx: audio_ctx,
+		bpm: 120
+	});
+
+	//
+	// Virtual KBD
+	const vkbd = new PicoMIDIKBD(midi_ch);
+		vkbd.listen("send", (_data) => {
+			user.update_midi(_data);
+			//ws.send("update", user.share);
+		});
+		user.set_midi_input(vkbd);
+
+	//
+	// Three.js Stage
+	const stage = new PicoStage(document.getElementById("renderer"));
+
+	//
+	// MIDI Controler
+	const midi_ctrl = new PicoMIDICtrl();
+
+		//
+		//
+		midi_ctrl.listen("ready", (_io) => {
+			midi_ctrl.push_output(osc);
+			midi_ctrl.push_input(user.local.midi.input);
+		});
+
+		//
+		//
+		midi_ctrl.listen("get_midi", (_msg) => {
+			const raw_data = _msg.data;
+			const outputs  = _msg.outputs;
+			outputs.forEach((_output) => {
+				_output.set_midi_data(raw_data);
+			});
+		});
+
+	//
+	// KBD Event handler
+	const kbd = new PicoKBD();
+
+		// 3D avatar move
+		kbd.listen("move", (_data) => {
+			user.update_position(_data);
+			//ws.send("update", user.share);
+		});
+
+		// MIDI CC change
+		kbd.listen("midi_cc", (_data) => {
+			vkbd.set_midi_cc(_data);
+		});
+
+		// MIDI note on
+		kbd.listen("note_on", (_data) => {
+			vkbd.set_note_on(_data);
+		});
+
+		// MIDI note off
+		kbd.listen("note_off", (_data) => {
+			vkbd.set_note_off(_data);
+		});
+
+	/*
+	ws.on("update", (_share) => {
+		users[_share.id].be_updated(_share);
+	});
+	*/
+
+
+	//
+	const name = document.getElementById("name");
+	name.addEventListener("focus", () => {
+		kbd.is_use_other = true;
+	});
+	name.addEventListener("blur", () => {
+		kbd.is_use_other = false;
+	});
+
+	//
+	const make = document.getElementById("make");
+	make.addEventListener("click", () => {
+		const data = {
+			icon  : "./images/icon/guest.png",
+			id    : (new Date()).getTime(),
+			name  : name.value,
+		};
+		user.init(data);
+		stage.push(user.local.three);
+	});
+
+};
+		</script>
+	</head>
+<style>
+.header {
+	margin: 0 auto;
+	width : 1200px;
+}
+.header__title {
+	color      : #fff;
+	font-weight: bold;
+	margin     : 20px 0;
+}
+.container {
+	margin: 0 auto;
+	width : 1200px;
+}
+.area_renderer {}
+.renderer {
+	background: #fff;
+	height    : 400px;
+	width     : 1200px;
+}
+.area_dsc {
+	color          : #fefefe;
+	display        : flex;
+	flex-flow      : row nowrap;
+	justify-content: space-between;
+	margin         : 0 auto;
+	padding        : 20px 5px 10px 5px;
+	width          : 1200px;
+}
+.dsc__left {}
+.dsc__form {}
+.dsc__form_label,
+inputtext].dsc__form_text {
+	display: inline-block;
+	margin : 0 5px 0 0;
+}
+.dsc__right {}
+.dsc__title {
+	font-weight: bold;
+	line-height: 200%;
+}
+.dsc__faq {
+	list-style-type: disc;
+	margin         : 0 0 20px 30px;
+}
+.dsc__faq_row {
+	line-height: 150%;
+}
+
+.footer {
+	margin    : 10px auto 20px auto;
+	text-align: center;
+	width     : 1200px;
+}
+.footer__copyright {
+	color: #fefefe;
+}
+</style>
+
+	<body>
+		<header class="header">
+			<h1 class="header__title">チプチュー星人の集い</h1>
+		</header>
+		<div class="container">
+			<section class="area_renderer">
+				<div class="renderer" id="renderer"></div>
+			</section>
+			<section class="area_dsc">
+				<div class="dsc__left">
+					<div class="dsc__form">
+						<label class="dsc__form_label">おなまえ</label>
+						<input class="dsc__form_text" id="name" type="text">
+						<input class="dsc__form_btn" id="make" type="button" value="作成">
+					</div>
+				</div>
+				<div class="dsc__right">
+					<h2 class="dsc__title">なんすかこれ？</h2>
+					<ul class="dsc__faq">
+						<li class="dsc__faq_row">「おなまえ」を入れて「作成」を押すと星人が出てきます。</li>
+						<li class="dsc__faq_row">キーボードで音を出したりキャラを動かしたり出来ます。</li>
+						<li class="dsc__faq_row">キーボードの 「 Z X C V B N M < 」が白鍵盤です。</li>
+						<li class="dsc__faq_row">キーボードの 「 S D G H J 」が黒鍵盤です。</li>
+						<li class="dsc__faq_row">キーボードの「 ↑ ↓ ← → 」 で移動します。</li>
+						<li class="dsc__faq_row">移動した場所によって音の位置も変わります。ヘッドフォンで聞くとわかります。</li>
+					</ul>
+					<h2 class="dsc__title">今度の予定</h2>
+					<ul class="dsc__faq">
+						<li class="dsc__faq_row">色んな人と合奏できるようにする</li>
+						<li class="dsc__faq_row">チャットできるようにする</li>
+						<li class="dsc__faq_row">ツイッターでログイン画面作る？＋ゲストログイン画面</li>
+						<li class="dsc__faq_row">星人のいるとこの背景とか作る</li>
+						<li class="dsc__faq_row">ていうか、星人のデザインをなんとかする。</li>
+						<li class="dsc__faq_row">後は、なんか、わかんないけど。</li>
+					</ul>
+					<h2 class="dsc__title">ご意見ご要望</h2>
+					<ul class="dsc__faq">
+						<li class="dsc__faq_row"><a href="https://twitter.com/psychedesire">@psychedesire</a> までどうぞ。</li>
+					</ul>
+				</div>
+			</section>
+		</div>
+		<footer class="footer">
+			<p class="footer__copyright">&copy;2018 www.psychedesire.org | <a href="https://github.com/psychedesire" target="_blank">github</a></p>
+		</footer>
+	</body>
+</html>
