@@ -34,7 +34,6 @@ class PicoOSC {
 	//
 	stop(){
 		if(!this.osc){ return; }
-		if(this.time_release == 0){ this.osc.stop(); return; }
 		const time = parseFloat(this.ctx.currentTime) + this.time_release;
 		this.set_gain_time([{level: 0, time: time}]);
 		this.osc.stop();
@@ -43,7 +42,7 @@ class PicoOSC {
 
 	//
 	play(_data){
-		if(this.osc){ this.stop(); }
+		if(this.osc){ this.stop(); return; }
 		const hz         = this.hex_to_hz(_data.note);
 		const velocity   = this.hex_to_float(_data.velocity);
 		const pan_x      = (this.pan_x - 0.5) * 200;
@@ -61,7 +60,8 @@ class PicoOSC {
 		this.osc.connect(this.gain_node);
 		this.osc.start                    (time_start);
 		this.gain_node.gain.setValueAtTime(0, time_start); // envelop start
-		this.set_gain_time([a, d, s, r]);
+		this.set_gain_time([a, d, s]);
+//		this.set_gain_time([a, d, s, r]);
 		this.gain_node.connect(this.panner);
 		this.panner.connect(this.ctx.destination);
 	};

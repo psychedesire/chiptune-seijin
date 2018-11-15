@@ -1,0 +1,79 @@
+/*
+ *
+ * avatar
+ *
+ * *************************** */
+
+.comment_box {
+	height    : 100px;
+	position  : absolute;
+	right     : -180px;
+	top       : -60px;
+	width     : 200px;
+	z-index   : 10;
+}
+
+.comment_inner {
+	height  : 100%;
+	position: relative;
+	width   : 100%;
+}
+
+.comment_line {
+	animation    : scroll_comment__anime 5s linear 0s 1 alternate none running;
+	background   : #fefefe;
+	border       : 5px solid #00a2e8;
+	border-radius: 5px;
+	bottom       : 0;
+	left         : 0;
+	opacity      : 1;
+	padding      : 6px;
+	position     : absolute;
+	width        : 100%;
+}
+
+@keyframes scroll_comment__anime {
+	  0% { bottom:   0px: opacity: 1; }
+	 50% { bottom:  20px; opacity: 1; }
+	 75% { bottom:  80px; opacity: 0.1; }
+	100% { bottom: 100px; opacity: 0; }
+}
+
+.avatar {
+	text-align: center;
+	position  : relative;
+}
+.avatar__image {
+	height: auto;
+	margin: 0 auto;
+	width : 48px;
+}
+.avatar__image_src {
+	filter: drop-shadow(0 0 5px #ffffff);
+	height: auto;
+	width : 100%;
+}
+.avatar__title {
+	height: 16px;
+	margin: 10px auto 0 auto;
+}
+.avatar__icon {
+	display       : inline-block;
+	height        : 16px;
+	margin-right  : 3px;
+	width         : 16px;
+}
+.avatar__icon_src {
+	filter: drop-shadow(0 0 5px #ffffff);
+	height: auto;
+	width : 100%;
+}
+.avatar__name {
+	color      : #00a2e8;
+	display    : inline-block;
+	filter     : drop-shadow(0 0 5px #ffffff);
+	font-size  : 12px;
+	font-weight: bold;
+	height     : 16px;
+	padding-top: 2px;
+}

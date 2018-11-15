@@ -30,12 +30,18 @@ class PicoUser {
 	vkbd_note_off(_pckey){
 		if(!this.local.vkbd){ return; }
 		this.local.vkbd.set_note_off(_pckey);
+		this.local.seijin.childNodes[0].style.filter = `drop-shadow(0 0 15px #ffffff)`;
 	};
 
 	//
 	vkbd_note_on(_pckey){
 		if(!this.local.vkbd){ return; }
 		this.local.vkbd.set_note_on(_pckey);
+		const nums = [ 90, 83, 88, 68, 67, 86, 71, 66, 72, 78, 74, 77, 188]
+		const alps = ["z","s","x","d","c","v","g","b","h","n","j","m","y"];
+		const alp  = alps[nums.indexOf(_pckey)];
+		const color = ("#" + parseInt(alp + alp + alp + alp, 36).toString(16) + "0").slice(0, 7);
+		this.local.seijin.childNodes[0].style.filter = `drop-shadow(0 0 15px ${color})`;
 	};
 
 	//
@@ -108,26 +114,37 @@ class PicoUser {
 		return ret;
 	}
 
+	//
+	create_seijin(){
+		const ret = document.createElement("figure");
+		ret.classList.add("avatar__image");
+		ret.innerHTML = `<img class="avatar__image_src" src="./images/avatar/seijin.png">`;
+		return ret;
+	};
+
 	// create 2D Avatar
 	create_2d_avatar(){
 		const data = this.share;
+		//
 		const ret  = document.createElement("div");
 		ret.classList.add("avatar");
-		ret.innerHTML = `
-			<figure class="avatar__image">
-				<img class="avatar__image_src" src="./images/avatar/seijin.png">
-			</figure>
-			<div class="avatar__title">
-				<figure class="avatar__icon"><img class="avatar__icon_src" src=${data.icon}></figure>
-				<span class="avatar__name">${data.name}</span>
-			</div>
+		//
+		const title = document.createElement("div");
+		title.classList.add("avatar__title");
+		title.innerHTML = `
+			<figure class="avatar__icon"><img class="avatar__icon_src" src=${data.icon}></figure>
+			<span class="avatar__name">${data.name}</span>
 		`;
+		ret.appendChild(title);
+		//
+		ret.appendChild(this.local.seijin);
 		ret.appendChild(this.local.comment);
 		return ret;
 	};
 
 	clear_self(){
 		this.local.comment  = null;
+		this.local.seijin   = null;
 		this.local.dom      = null;
 		this.local.three    = null;
 		this.local.vkbd     = null;
@@ -157,6 +174,7 @@ class PicoUser {
 		this.id = _cnf.id;
 		this.prepare_share_status(_cnf);
 		this.local.comment = this.create_2d_box();
+		this.local.seijin  = this.create_seijin();
 		this.local.dom     = this.create_2d_avatar();
 		this.local.three   = this.create_3d_avatar();
 		this.is_init       = true;

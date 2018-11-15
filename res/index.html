@@ -18,87 +18,9 @@
 		<link rel="icon" type="image/png" href="./images/icon.png">
 		<link href="./css/fontawesome_all.css" media="all" rel="stylesheet">
 		<link href="./css/reset.css" media="all" rel="stylesheet">
-		<style>
-body {
-	background: #000;
-}
-
-
-/*
- *
- * avatar
- *
- * *************************** */
-
-.comment_box {
-	height    : 100px;
-	position  : absolute;
-	right     : -180px;
-	top       : -60px;
-	width     : 200px;
-	z-index   : 10;
-}
-
-.comment_inner {
-	height  : 100%;
-	position: relative;
-	width   : 100%;
-}
-
-.comment_line {
-	animation    : scroll_comment__anime 5s linear 0s 1 alternate none running;
-	background   : #fefefe;
-	border       : 5px solid #00a2e8;
-	border-radius: 5px;
-	bottom       : 0;
-	left         : 0;
-	opacity      : 1;
-	padding      : 6px;
-	position     : absolute;
-	width        : 100%;
-}
-
-@keyframes scroll_comment__anime {
-	  0% { bottom:   0px: opacity: 1; }
-	 50% { bottom:  20px; opacity: 1; }
-	 75% { bottom:  80px; opacity: 0.1; }
-	100% { bottom: 100px; opacity: 0; }
-}
-
-.avatar {
-	text-align: center;
-	position  : relative;
-}
-.avatar__image {
-	height: auto;
-	margin: 0 auto;
-	width : 48px;
-}
-.avatar__image_src {
-	height: auto;
-	width: 100%;
-}
-.avatar__title {
-	height: 16px;
-	margin: 10px auto 0 auto;
-}
-.avatar__icon {
-	display       : inline-block;
-	height        : 16px;
-	margin-right  : 3px;
-	width         : 16px;
-}
-.avatar__icon_src {
-	height: auto;
-	width : 100%;
-}
-.avatar__name {
-	display       : inline-block;
-	font-size     : 12px;
-	height        : 16px;
-	padding-top   : 2px;
-}
-		</style>
+		<link href="./css/main.css" media="all" rel="stylesheet">
+		<link href="./css/stage.css" media="all" rel="stylesheet">
+		<link href="./css/avatar.css" media="all" rel="stylesheet">
 		<script src="./js/socket.io.slim.js"></script>
 		<script src="./js/three.min.js"></script>
 		<script src="./js/CSS3DRenderer.js"></script>
@@ -109,7 +31,6 @@ body {
 		<script src="./js/pico_osc.js"></script>
 		<script src="./js/pico_kbd.js"></script>
 		<script>
-
 const get_target_user = (_users, _id) => {
 	if(!_id){ return false; }
 	let ret = _users.filter((_user) => { return(_user.share.id === _id); });
@@ -159,8 +80,7 @@ window.onload = function(){
 
 	//
 	//
-	const ws = io.connect("https://chiptune-seijin.herokuapp.com");
-//	const ws = io.connect("http://localhost:8080/");
+	const ws = io.connect(location.href);
 		ws.on("put_id", (_data) => { current_id = _data.id; });
 		//
 		//
@@ -301,78 +221,33 @@ window.onload = function(){
 	comment.addEventListener("blur", ()  => { kbd.is_use_other = false; });
 
 	//
-	const speak = document.getElementById("speak");
-	speak.addEventListener("click", () => {
+	const speak    = document.getElementById("speak");
+
+	const speaking = () => {
 		const val = comment.value;
 		if(!current.is_init)     { return; }
 		if( val === ""){ return; }
 		const data = {id: current.id, comment: val };
 		current.create_comment_line(val);
 		ws.emit("comment", data);
+		comment.value = "";
+		// comment.blur();
+	};
+
+	speak.addEventListener("click", () => {
+		speaking();
+	});
+
+	window.addEventListener("keydown", (_event) => {
+		const key = _event.keyCode;
+		if(key === 13 && kbd.is_use_other){
+			speaking();
+		}
 	});
 
 };
 		</script>
 	</head>
-<style>
-.header {
-	margin: 0 auto;
-	width : 1200px;
-}
-.header__title {
-	color      : #fff;
-	font-weight: bold;
-	margin     : 20px 0;
-}
-.container {
-	margin: 0 auto;
-	width : 1200px;
-}
-.area_renderer {}
-.renderer {
-	background: #fff;
-	height    : 400px;
-	width     : 1200px;
-}
-.area_dsc {
-	color          : #fefefe;
-	display        : flex;
-	flex-flow      : row nowrap;
-	justify-content: space-between;
-	margin         : 0 auto;
-	padding        : 20px 5px 10px 5px;
-	width          : 1200px;
-}
-.dsc__left {}
-.dsc__form {}
-.dsc__form_label,
-inputtext].dsc__form_text {
-	display: inline-block;
-	margin : 0 5px 0 0;
-}
-.dsc__right {}
-.dsc__title {
-	font-weight: bold;
-	line-height: 200%;
-}
-.dsc__faq {
-	list-style-type: disc;
-	margin         : 0 0 20px 30px;
-}
-.dsc__faq_row {
-	line-height: 150%;
-}
-
-.footer {
-	margin    : 10px auto 20px auto;
-	text-align: center;
-	width     : 1200px;
-}
-.footer__copyright {
-	color: #fefefe;
-}
-</style>
-
 	<body>
 		<header class="header">
 			<h1 class="header__title">チプチュー星人の集い</h1>
@@ -405,10 +280,8 @@ inputtext].dsc__form_text {
 					</ul>
 					<h2 class="dsc__title">今度の予定</h2>
 					<ul class="dsc__faq">
-						<li class="dsc__faq_row">誰が音を出してるかわかるようにする。</li>
 						<li class="dsc__faq_row">画面リロード→キャラ再作成でなんかバグるかも。</li>
 						<li class="dsc__faq_row">ツイッターでログイン画面作る？＋ゲストログイン画面</li>
-						<li class="dsc__faq_row">星人のいるとこの背景とか作る</li>
 						<li class="dsc__faq_row">ていうか、星人のデザインをなんとかする。</li>
 						<li class="dsc__faq_row">後は、なんか、わかんないけど。</li>
 					</ul>

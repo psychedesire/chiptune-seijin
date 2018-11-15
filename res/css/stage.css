@@ -1,0 +1,21 @@
+/*
+ *
+ * stage
+ *
+ * *************************** */
+.stage__floor {
+	background: url("../images/stage/001/floor.png") repeat;
+	height    : 1000px;
+	width     : 750px;
+}
+.stage__wall {
+	background: url("../images/stage/001/wall.png") repeat;
+	height    : 500px;
+	width     : 1000px;
+}
+
+.stage__back {
+	background: #c3c3c3 url("../images/stage/001/back.png") no-repeat center center;
+	height    : 300px;
+	width     : 1000px;
+}
