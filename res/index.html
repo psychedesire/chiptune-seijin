@@ -119,9 +119,9 @@ const get_target_user = (_users, _id) => {
 window.onload = function(){
 	  let midi_ch    = 0;
 	  let current_id = 0;
+	  let users      = [];
 	const audio_ctx  = new (window.AudioContext || window.webkitAudioContext)();
 	const bpm        = 120;
-	const users      = [];
 
 	//
 	// Three.js Stage
