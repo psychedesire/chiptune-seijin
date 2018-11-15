@@ -111,6 +111,7 @@ body {
 		<script>
 
 const get_target_user = (_users, _id) => {
+	if(!_id){ return false; }
 	let ret = _users.filter((_user) => { return(_user.share.id === _id); });
 	if(!ret || !ret.length){ return false; }
 	return ret[0];
@@ -170,7 +171,7 @@ window.onload = function(){
 		//
 		//
 		ws.on("response_share"  , (_data) => {
-			if(current.share.id === _data.id){ return; }
+			if(!_data.id || current.share.id === _data.id){ return; }
 			const is = users.some((_user) => { return (_user.share.id === _data.id); });
 			if(is){ return; }
 			//
