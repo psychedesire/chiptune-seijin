@@ -204,6 +204,16 @@ window.onload = function(){
 	make.addEventListener("click", () => {
 		if(current.is_init) { alert("一回しか出来ないだす。"); return; }
 		if(current_id === 0){ alert("もうちょっと待って。"); return; }
+		//
+		//
+		const left   = document.querySelector(".dsc__left");
+		const center = document.querySelector(".dsc__center");
+		left.style.width     = 0;
+		left.style.display   = "none";
+		center.style.width   = "49.5%";
+		center.style.display = "block";
+		//
+		//
 		const data = {
 			icon  : "./images/icon/guest.png",
 			id    : current_id,
@@ -258,19 +268,43 @@ window.onload = function(){
 			</section>
 			<section class="area_dsc">
 				<div class="dsc__left">
-					<h3 style="color:#ff0000;margin:20px 0">※パソコンの Google Chrome じゃないと動かないだす。</h3>
+					<h2 class="dsc__title icon_join">Join to Chat</h2>
 					<div class="dsc__form">
-						<label class="dsc__form_label">おなまえ</label>
+						<label class="dsc__form_label">NAME</label>
 						<input class="dsc__form_text" id="name" type="text">
-						<input class="dsc__form_btn" id="make" type="button" value="作成">
+						<div class="dsc__btn" id="make">
+							<span class="fas fa-sign-in-alt"></span>
+							<span>Join</span>
+						</div>
 					</div>
-					<div class="dsc__form" style="margin-top:30px;">
+					<h2 class="dsc__title icon_require">Require</h2>
+					<div class="dsc__form require__boxes">
+						<div class="require__box">
+							<span class="require__icon fas fa-desktop"></span>
+							<p class="require__dsc">スマートフォンでは動きません。<br>for PC Only</p>
+						</div>
+						<div class="require__box">
+							<span class="require__icon fab fa-chrome"></span>
+							<p class="require__dsc">Google Chrome のみで動きます。<br>for Google Chrome</p>
+						</div>
+						<div class="require__box">
+							<span class="require__icon fas fa-headphones-alt"></span>
+							<p class="require__dsc">ヘッドフォンがあると<br>より楽しめます。<br>Require Headphone</p>
+						</div>
+					</div>
+				</div>
+				<div class="dsc__center">
+					<h2 class="dsc__title icon_panel">Control</h2>
+					<div class="dsc__form">
 						<input class="dsc__form_text" id="comment" style="width:450px" type="text">
-						<input class="dsc__form_btn" id="speak" type="button" value="喋る">
+						<div class="dsc__btn" id="speak">
+							<span class="fas fa-comment"></span>
+							<span>Chat</span>
+						</div>
 					</div>
 				</div>
 				<div class="dsc__right">
-					<h2 class="dsc__title">なんすかこれ？</h2>
+					<h2 class="dsc__title icon_question">FAQ</h2>
 					<ul class="dsc__faq">
 						<li class="dsc__faq_row">「おなまえ」を入れて「作成」を押すと星人が出てきます。</li>
 						<li class="dsc__faq_row">キーボードで音を出したりキャラを動かしたり出来ます。</li>
@@ -279,14 +313,16 @@ window.onload = function(){
 						<li class="dsc__faq_row">キーボードの「 ↑ ↓ ← → 」 で移動します。</li>
 						<li class="dsc__faq_row">移動した場所によって音の位置も変わります。ヘッドフォンで聞くとわかります。</li>
 					</ul>
-					<h2 class="dsc__title">今度の予定</h2>
+					<!--
+					<h2 class="dsc__title icon_schedule">Release Schedules</h2>
 					<ul class="dsc__faq">
 						<li class="dsc__faq_row">画面リロード→キャラ再作成でなんかバグるかも。</li>
 						<li class="dsc__faq_row">ツイッターでログイン画面作る？＋ゲストログイン画面</li>
 						<li class="dsc__faq_row">ていうか、星人のデザインをなんとかする。</li>
 						<li class="dsc__faq_row">後は、なんか、わかんないけど。</li>
 					</ul>
-					<h2 class="dsc__title">ご意見ご要望</h2>
+					-->
+					<h2 class="dsc__title icon_twitter">ご意見ご要望</h2>
 					<ul class="dsc__faq">
 						<li class="dsc__faq_row"><a href="https://twitter.com/psychedesire">@psychedesire</a> までどうぞ。</li>
 					</ul>
@@ -294,7 +330,7 @@ window.onload = function(){
 			</section>
 		</div>
 		<footer class="footer">
-			<p class="footer__copyright">&copy;2018 www.psychedesire.org | <a href="https://github.com/psychedesire" target="_blank">github</a></p>
+			<p class="footer__copyright">&copy;2018 <a href="http://www.psychedesire.org/" target="_blank">www.psychedesire.org</a> | <a href="https://github.com/psychedesire" target="_blank">github</a></p>
 		</footer>
 	</body>
 </html>

@@ -30,14 +30,14 @@ class PicoStage {
 		const wall_l_dom = document.createElement("div");
 		wall_l_dom.classList.add("stage__wall");
 		const wall_l = new THREE.CSS3DObject(wall_l_dom);
-		wall_l.position.fromArray([-450,       0, -600]);
+		wall_l.position.fromArray([-450,      95, -600]);
 		wall_l.rotation.fromArray([   0,  -80.11, 0]);
 		this.scene.add(wall_l);
 		// wall right
 		const wall_r_dom = document.createElement("div");
 		wall_r_dom.classList.add("stage__wall");
 		const wall_r = new THREE.CSS3DObject(wall_r_dom);
-		wall_r.position.fromArray([450,       0, -600]);
+		wall_r.position.fromArray([450,      95, -600]);
 		wall_r.rotation.fromArray([  0,  -80.11, 0]);
 		this.scene.add(wall_r);
 		// back

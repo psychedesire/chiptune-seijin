@@ -1,6 +1,17 @@
+/*
+#4cc9ff
+#00b2ff
+#00a2e8
+#008ecc
+#26657f
+#4c717f
+#737c7f
+*/
+
 .header {
-	margin: 0 auto;
-	width : 1200px;
+	border-top: 5px solid #008ecc;
+	margin    : 0 auto;
+	width     : 1200px;
 }
 .header__title {
 	color      : #fff;
@@ -11,7 +22,11 @@
 	margin: 0 auto;
 	width : 1200px;
 }
-.area_renderer {}
+.area_renderer {
+	border-color: #008ecc;
+	border-style: solid;
+	border-width: 5px 0 5px;
+}
 .renderer {
 	background: #666666;
 	height    : 400px;
@@ -25,25 +40,107 @@ body {
 	display        : flex;
 	flex-flow      : row nowrap;
 	justify-content: space-between;
-	margin         : 0 auto;
-	padding        : 20px 5px 10px 5px;
+	margin         : 20px auto 0 auto;
 	width          : 1200px;
 }
-.dsc__left {}
-.dsc__form {}
-.dsc__form_label,
-inputtext].dsc__form_text {
-	display: inline-block;
-	margin : 0 5px 0 0;
+.dsc__left {
+	display: block;
+	width  : 49.5%;
 }
-.dsc__right {}
+.dsc__center {
+	display: none;
+	width  : 0%;
+}
+.dsc__right {
+	width: 49.5%;
+}
+	.require__boxes {
+		display        : flex;
+		flex-flow      : row nowrap;
+		justify-content: space-around;
+	}
+		.require__box {
+			text-align: center;
+			width     : 33.33%;
+		}
+			.require__icon { font-size: 48px; }
+			.require__dsc  {
+				font-size : 12px;
+				line-height: 150%;
+				padding   : 10px 5px;
+			}
+
 .dsc__title {
-	font-weight: bold;
-	line-height: 200%;
+	background   : #008ecc;
+	border       : 1px solid #26657f;
+	border-radius: 3px;
+	font-size    : 14px;
+	font-weight  : bold;
+	padding      : 5px 10px;
 }
+	.icon_join:before {
+		content      : "\f2f6";
+		font-family  : "Font Awesome 5 Free";
+		padding-right: 5px;
+	}
+
+	.icon_require:before {
+		content      : "\f0a4";
+		font-family  : "Font Awesome 5 Free";
+		padding-right: 5px;
+	}
+
+	.icon_panel:before {
+		content      : "\f5ba";
+		font-family  : "Font Awesome 5 Free";
+		padding-right: 5px;
+	}
+
+	.icon_question:before {
+		content      : "\f128";
+		font-family  : "Font Awesome 5 Free";
+		padding-right: 5px;
+	}
+
+	.icon_schedule:before {
+		content      : "\f073";
+		font-family  : "Font Awesome 5 Free";
+		padding-right: 5px;
+	}
+
+	.icon_twitter:before {
+		content      : "\f099";
+		font-family  : "Font Awesome 5 Brands";
+		padding-right: 5px;
+	}
+
+.dsc__form {
+	padding: 15px 0 35px 5px;
+}
+
+	.dsc__form_label,
+	input[type=text].dsc__form_text {
+		border-radius: 3px;
+		display      : inline-block;
+		margin       : 0 5px 0 0;
+		padding      : 2px;
+	}
+
+	.dsc__btn {
+		background   : #4cc9ff;
+		border       : 1px solid #4cc9ff;
+		color        : #fefefe;
+		cursor       : pointer;
+		border-radius: 3px;
+		display      : inline;
+		font-weight  : bold;
+		padding      : 2px 15px;
+	}
+
 .dsc__faq {
 	list-style-type: disc;
-	margin         : 0 0 20px 30px;
+	padding        : 15px 0 25px 5px;
+	margin         : 0 0 0 30px;
 }
 .dsc__faq_row {
 	line-height: 150%;

@@ -10,7 +10,7 @@
 }
 .stage__wall {
 	background: url("../images/stage/001/wall.png") repeat;
-	height    : 500px;
+	height    : 320px;
 	width     : 1000px;
 }
 
