@@ -8,11 +8,11 @@
 		<meta name="description" content="LiveStreamSystem">
 		<meta name="mobile-web-app-capable" content="yes">
 		<meta name="viewport" content="width=device-width,initial-scale=1">
-		<meta property="og:site_name" content="www.psychedesire.org">
+		<meta property="og:site_name" content="チプチュー星人">
 		<meta property="og:type" content="article">
-		<meta property="og:url" content="http://localhost:8080/livestream/">
-		<meta property="og:title" content="www.psychedesire.org > LiveStream">
-		<meta property="og:description" content="psychedesire LiveStreamSystem">
+		<meta property="og:url" content="https://chiptune-seijin.herokuapp.com/">
+		<meta property="og:title" content="チプチュー星人">
+		<meta property="og:description" content="Chat with Chiptune">
 		<meta property="og:image" content="http://www.psychedesire.org/images/icon.png">
 		<meta property="og:locale" content="ja_JP">
 		<link rel="icon" type="image/png" href="./images/icon.png">
@@ -29,8 +29,45 @@ body {
  * avatar
  *
  * *************************** */
+
+.comment_box {
+	height    : 100px;
+	position  : absolute;
+	right     : -180px;
+	top       : -60px;
+	width     : 200px;
+	z-index   : 10;
+}
+
+.comment_inner {
+	height  : 100%;
+	position: relative;
+	width   : 100%;
+}
+
+.comment_line {
+	animation    : scroll_comment__anime 5s linear 0s 1 alternate none running;
+	background   : #fefefe;
+	border       : 5px solid #00a2e8;
+	border-radius: 5px;
+	bottom       : 0;
+	left         : 0;
+	opacity      : 1;
+	padding      : 6px;
+	position     : absolute;
+	width        : 100%;
+}
+
+@keyframes scroll_comment__anime {
+	  0% { bottom:   0px: opacity: 1; }
+	 50% { bottom:  20px; opacity: 1; }
+	 75% { bottom:  80px; opacity: 0.1; }
+	100% { bottom: 100px; opacity: 0; }
+}
+
 .avatar {
-	text-align:center;
+	text-align: center;
+	position  : relative;
 }
 .avatar__image {
 	height: auto;
@@ -62,6 +99,7 @@ body {
 	padding-top   : 2px;
 }
 		</style>
+		<script src="./js/socket.io.slim.js"></script>
 		<script src="./js/three.min.js"></script>
 		<script src="./js/CSS3DRenderer.js"></script>
 		<script src="./js/pico_user.js"></script>
@@ -71,32 +109,19 @@ body {
 		<script src="./js/pico_osc.js"></script>
 		<script src="./js/pico_kbd.js"></script>
 		<script>
+
+const get_target_user = (_users, _id) => {
+	let ret = _users.filter((_user) => { return(_user.share.id === _id); });
+	if(!ret || !ret.length){ return false; }
+	return ret[0];
+};
+
 window.onload = function(){
-	  let midi_ch   = 0;
-	const audio_ctx = new (window.AudioContext || window.webkitAudioContext)();
-	const bpm       = 120;
-	const users     = {};
-
-	//
-	// Current User
-	const user = new PicoUser();
-
-	//
-	// WebAudio OSC
-	const osc = new PicoOSC({
-		ch : midi_ch,
-		ctx: audio_ctx,
-		bpm: 120
-	});
-
-	//
-	// Virtual KBD
-	const vkbd = new PicoMIDIKBD(midi_ch);
-		vkbd.listen("send", (_data) => {
-			user.update_midi(_data);
-			//ws.send("update", user.share);
-		});
-		user.set_midi_input(vkbd);
+	  let midi_ch    = 0;
+	  let current_id = 0;
+	const audio_ctx  = new (window.AudioContext || window.webkitAudioContext)();
+	const bpm        = 120;
+	const users      = [];
 
 	//
 	// Three.js Stage
@@ -109,8 +134,12 @@ window.onload = function(){
 		//
 		//
 		midi_ctrl.listen("ready", (_io) => {
+			//
+			// WebAudio OSC for current user
+			const osc = new PicoOSC({ ch: midi_ch, ctx: audio_ctx, bpm: 120 });
+			//
 			midi_ctrl.push_output(osc);
-			midi_ctrl.push_input(user.local.midi.input);
+			midi_ctrl.push_input(current.local.vkbd);
 		});
 
 		//
@@ -124,56 +153,161 @@ window.onload = function(){
 		});
 
 	//
+	// Current User
+	const current = new PicoUser();
+
+	//
+	//
+	const ws = io.connect("https://chiptune-seijin.herokuapp.com");
+//	const ws = io.connect("http://localhost:8080/");
+		ws.on("put_id", (_data) => { current_id = _data.id; });
+		//
+		//
+		ws.on("request_shares", (_data) => {
+			if(!current.is_init){ return; }
+			ws.emit("relay_share", current.share);
+		});
+		//
+		//
+		ws.on("response_share"  , (_data) => {
+			if(current.share.id === _data.id){ return; }
+			const is = users.some((_user) => { return (_user.share.id === _data.id); });
+			if(is){ return; }
+			//
+			// push new user data to your local
+			//
+			midi_ch ++;
+			const vkbd = new PicoMIDIKBD(midi_ch);
+			//
+			const user = new PicoUser();
+			user.init(_data);
+			user.set_midi_ch(midi_ch);
+			user.set_vkbd(vkbd);
+			users.push(user);
+			//
+			stage.push(user.local.three);
+			//
+			const osc = new PicoOSC({ ch: midi_ch, ctx: audio_ctx, bpm: 120 });
+			midi_ctrl.push_output(osc);
+			midi_ctrl.push_input(user.local.vkbd);
+		});
+		//
+		//
+		//
+		ws.on("move", (_share) => {
+			//
+			const target = get_target_user(users, _share.id);
+			if(!target){ return; }
+			target.be_updated("move", _share);
+		});
+		//
+		// _data {id: user.id, pckey: pckey}
+		ws.on("pckey_on", (_data) => {
+			const target = get_target_user(users, _data.id);
+			if(!target){ return; }
+			target.vkbd_note_on(_data.pckey);
+		});
+		ws.on("pckey_off", (_data) => {
+			const target = get_target_user(users, _data.id);
+			if(!target){ return; }
+			target.vkbd_note_off(_data.pckey);
+		});
+		ws.on("midi_cc", (_data) => {
+			const target = get_target_user(users, _data.id);
+			if(!target){ return; }
+			target.vkbd_midi_cc(_data.midi);
+		});
+		ws.on("comment", (_data) => {
+			const target = get_target_user(users, _data.id);
+			if(!target){ return; }
+			target.create_comment_line(_data.comment);
+		});
+		ws.on("remove", (_data) => {
+			const target = get_target_user(users, _data.id);
+			if(!target){ return; }
+			const reflesh = [];
+			users.forEach((_user) => { reflesh.push(_user); });
+			stage.pop(target.local.three);
+			target.clear_self();
+			users = reflesh;
+		});
+
+	//
+	// Virtual KBD
+	const current_vkbd = new PicoMIDIKBD(midi_ch);
+	current.set_vkbd(current_vkbd);
+
+	//
 	// KBD Event handler
 	const kbd = new PicoKBD();
 
 		// 3D avatar move
 		kbd.listen("move", (_data) => {
-			user.update_position(_data);
-			//ws.send("update", user.share);
+			if(!current.is_init){ return; }
+			current.update_position(_data);
+			ws.emit("move", current.share);
 		});
 
 		// MIDI CC change
-		kbd.listen("midi_cc", (_data) => {
-			vkbd.set_midi_cc(_data);
+		kbd.listen("midi_cc", (_midi) => {
+			if(!current.is_init){ return; }
+			const data = {id: current.id, midi:_midi};
+			current.vkbd_midi_cc(_midi);
+			ws.emit("midi_cc", data);
 		});
 
 		// MIDI note on
-		kbd.listen("note_on", (_data) => {
-			vkbd.set_note_on(_data);
+		kbd.listen("note_on", (_pckey) => {
+			if(!current.is_init){ return; }
+			const data = {id: current.id, pckey: _pckey};
+			current.vkbd_note_on(_pckey);
+			ws.emit("pckey_on", data);
 		});
 
 		// MIDI note off
-		kbd.listen("note_off", (_data) => {
-			vkbd.set_note_off(_data);
+		kbd.listen("note_off", (_pckey) => {
+			if(!current.is_init){ return; }
+			const data = {id: current.id, pckey: _pckey};
+			current.vkbd_note_off(_pckey);
+			ws.emit("pckey_off", data);
 		});
-
-	/*
-	ws.on("update", (_share) => {
-		users[_share.id].be_updated(_share);
-	});
-	*/
 
 
 	//
 	const name = document.getElementById("name");
-	name.addEventListener("focus", () => {
-		kbd.is_use_other = true;
-	});
-	name.addEventListener("blur", () => {
-		kbd.is_use_other = false;
-	});
+	name.addEventListener("focus", () => { kbd.is_use_other = true; });
+	name.addEventListener("blur",  () => { kbd.is_use_other = false; });
 
 	//
 	const make = document.getElementById("make");
 	make.addEventListener("click", () => {
+		if(current.is_init) { alert("一回しか出来ないだす。"); return; }
+		if(current_id === 0){ alert("もうちょっと待って。"); return; }
 		const data = {
 			icon  : "./images/icon/guest.png",
-			id    : (new Date()).getTime(),
+			id    : current_id,
 			name  : name.value,
 		};
-		user.init(data);
-		stage.push(user.local.three);
+		current.init(data);
+		current.set_midi_ch(midi_ch);
+		stage.push(current.local.three);
+		ws.emit("relay_share", current.share);
+	});
+
+	//
+	const comment = document.getElementById("comment");
+	comment.addEventListener("focus", () => { kbd.is_use_other = true; });
+	comment.addEventListener("blur", ()  => { kbd.is_use_other = false; });
+
+	//
+	const speak = document.getElementById("speak");
+	speak.addEventListener("click", () => {
+		const val = comment.value;
+		if(!current.is_init)     { return; }
+		if( val === ""){ return; }
+		const data = {id: current.id, comment: val };
+		current.create_comment_line(val);
+		ws.emit("comment", data);
 	});
 
 };
@@ -253,6 +387,10 @@ inputtext].dsc__form_text {
 						<input class="dsc__form_text" id="name" type="text">
 						<input class="dsc__form_btn" id="make" type="button" value="作成">
 					</div>
+					<div class="dsc__form" style="margin-top:30px;">
+						<input class="dsc__form_text" id="comment" style="width:450px" type="text">
+						<input class="dsc__form_btn" id="speak" type="button" value="喋る">
+					</div>
 				</div>
 				<div class="dsc__right">
 					<h2 class="dsc__title">なんすかこれ？</h2>
@@ -266,8 +404,8 @@ inputtext].dsc__form_text {
 					</ul>
 					<h2 class="dsc__title">今度の予定</h2>
 					<ul class="dsc__faq">
-						<li class="dsc__faq_row">色んな人と合奏できるようにする</li>
-						<li class="dsc__faq_row">チャットできるようにする</li>
+						<li class="dsc__faq_row">誰が音を出してるかわかるようにする。</li>
+						<li class="dsc__faq_row">画面リロード→キャラ再作成でなんかバグるかも。</li>
 						<li class="dsc__faq_row">ツイッターでログイン画面作る？＋ゲストログイン画面</li>
 						<li class="dsc__faq_row">星人のいるとこの背景とか作る</li>
 						<li class="dsc__faq_row">ていうか、星人のデザインをなんとかする。</li>

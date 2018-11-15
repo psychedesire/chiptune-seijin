@@ -1,9 +1,13 @@
 class PicoStage {
 
+	pop(_user_local_three){
+		this.scene.remove(_user_local_three);
+	};
+
 	//
-	push(_user_private_three){
+	push(_user_local_three){
 		//this.users.add(_user_private_three);
-		this.scene.add(_user_private_three);
+		this.scene.add(_user_local_three);
 	};
 
 	//

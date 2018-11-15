@@ -15,17 +15,36 @@ class PicoUser {
 		this.events[_event].push(_callback);
 	};
 
-	// updated by other client from websocket msg
-	be_updated(_event, _share){
-		for(let key in _share){
-			this.share[key] = _share.key;
-		};
-		this.fire(_event, this.share);
+	//
+	set_midi_ch(_ch){
+		this.local.ch = _ch;
 	};
 
 	//
-	set_midi_input(_input){
-		this.local.midi.input = _input;
+	vkbd_midi_cc(_data){
+		if(!this.local.vkbd){ return; }
+		this.local.vkbd.set_midi_cc(_data);
+	};
+
+	//
+	vkbd_note_off(_pckey){
+		if(!this.local.vkbd){ return; }
+		this.local.vkbd.set_note_off(_pckey);
+	};
+
+	//
+	vkbd_note_on(_pckey){
+		if(!this.local.vkbd){ return; }
+		this.local.vkbd.set_note_on(_pckey);
+	};
+
+	//
+	set_vkbd(_input){
+		this.local.vkbd = _input;
+		this.local.vkbd.listen("send", (_data) => {
+			this.update_midi(_data);
+			//ws.send("update", current.share);
+		});
 	};
 
 	// update midi info
@@ -51,6 +70,28 @@ class PicoUser {
 		this.local.three.position.fromArray([pos.x, pos.y, pos.z]);
 	};
 
+	// updated by other client from websocket msg
+	be_updated(_event, _data){
+		if(_event === "move"){
+			const pos = _data.position;
+			this.local.three.position.fromArray([pos.x, pos.y, pos.z]);
+		}
+		if(_event !== "move"){ this,update_midi(_share); }
+		this.fire(_event, this.share);
+	};
+
+	//
+	create_comment_line(_comment){
+		const dom = document.createElement("div");
+		dom.classList.add("comment_line");
+		dom.innerText = _comment;
+		const inner = this.local.comment.childNodes[0];
+		inner.appendChild(dom);
+		const to = setTimeout(() => {
+			inner.removeChild(dom);
+		}, 5000);
+	};
+
 	// create 3D Avatar
 	create_3d_avatar(){
 		const pos = this.share.position;
@@ -59,6 +100,13 @@ class PicoUser {
 		ret.rotation.fromArray([0, 0, 0]);
 		return ret;
 	};
+
+	create_2d_box(){
+		const ret = document.createElement("div");
+		ret.classList.add("comment_box");
+		ret.innerHTML = `<div class="comment_inner"></div>`;
+		return ret;
+	}
 
 	// create 2D Avatar
 	create_2d_avatar(){
@@ -74,34 +122,44 @@ class PicoUser {
 				<span class="avatar__name">${data.name}</span>
 			</div>
 		`;
+		ret.appendChild(this.local.comment);
 		return ret;
+	};
+
+	clear_self(){
+		this.local.comment  = null;
+		this.local.dom      = null;
+		this.local.three    = null;
+		this.local.vkbd     = null;
+		this.local.ch       = null;
+		this.local          = null;
+		this.share.position = null;
+		this.share.midi     = null;
+		this.share          = null;
 	};
 
 	// create share status
 	prepare_share_status(_cnf){
+		const position = (_cnf.position) ? _cnf.position : {x: this.base_x, y: 0, z: this.base_z};
+		const midi     = (_cnf.midi)     ? _cnf.midi     : {cc7: 60, cc10: 64, notes: []};
 		//
 		this.share = _cnf;
 		// 3D(three.js) position
-		this.share.position = {x: this.base_x, y: 0, z: this.base_z};
+		this.share.position = position;
 		// WebAudio Setting
-		this.share.audio_shape = "sine";
+		this.share.audio_shape = "square";
 		// WebMIDI Setting
-		this.share.midi = {
-			ch   :  0, // midi channel
-			cc7  : 60, // volume...min:10 max:110,
-			cc10 : 64, // panning...min14 max 114,
-			notes: []  // on notes
-		};
+		this.share.midi = midi;
 	};
 
 	//
 	init(_cnf){
 		this.id = _cnf.id;
 		this.prepare_share_status(_cnf);
-		this.local.dom   = this.create_2d_avatar();
-		this.local.three = this.create_3d_avatar();
-		this.is_init     = true;
-		this.local.midi.input = null;
+		this.local.comment = this.create_2d_box();
+		this.local.dom     = this.create_2d_avatar();
+		this.local.three   = this.create_3d_avatar();
+		this.is_init       = true;
 	};
 
 	//
@@ -121,7 +179,8 @@ class PicoUser {
 		//
 		// local status / DOM for three.js / WebMIDI input ...
 		this.local      = {};
-		this.local.midi = {};
+		this.local.ch   = 0;
+		this.local.vkbd = "hogehoge";
 	};
 
 };
